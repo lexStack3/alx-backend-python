@@ -4,11 +4,13 @@ from mysql.connector.connection import MySQLConnection
 from mysql.connector.connection_cext import CMySQLConnection
 from uuid import uuid4
 import csv
+import os
 
 config = {
-        'host': "localhost",
-        'user': "lex",
-        'password': "253926337"
+        'host': os.getenv('DB_HOST'),
+        'user': os.getenv('DB_USER'),
+        'password': os.getenv('DB_PASSWD'),
+        'port': os.getenv('DB_PORT')
         }
 
 def connect_db():
@@ -82,7 +84,7 @@ def insert_data(connection, data):
             for user in users:
                 name = user.get('name')
                 email = user.get('email')
-                age = user.get('age')
+                age = int(user.get('age'))
 
                 old_user = [person for person in old_users if person[1] == name and
                             person[2] == email and int(person[3]) == age]
