@@ -15,6 +15,8 @@ config = {
 
 def connect_db():
     """Connects to a MySQL Database Server."""
+    if not all(config.values()):
+        raise EnvironmentError("Some required environmental variables missing.")
     connection = mysql.connector.connect(**config)
     return connection
 
@@ -38,9 +40,9 @@ def create_database(connection):
 
 def connect_to_prodev():
     """Connects to the ALX_prodev database in MySQL."""
-    newConfig = dict(config)
-    newConfig['database'] = "ALX_prodev"
-    connection = mysql.connector.connect(**newConfig)
+    connection = connect_db()
+    cursor = connection.cursor()
+    cursor.execute("USE ALX_prodev;")
     return connection
 
 def create_table(connection):
