@@ -1,8 +1,10 @@
 #!/usr/bin/python3
-"""Creates a generator to fetch and process data in batches from the users database.
+"""Creates a generator to fetch and process data in batches from the
+users database.
 """
 import mysql.connector
 seed = __import__('seed')
+
 
 def stream_users_in_batches(batch_size):
     """Fetches rows in batches:
