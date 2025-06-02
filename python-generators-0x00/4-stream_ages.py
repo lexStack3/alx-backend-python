@@ -5,7 +5,7 @@
 seed = __import__('seed')
 
 
-def stream_user_age():
+def stream_user_ages():
     """Yields user ages one by one."""
     connection = seed.connect_to_prodev()
     cursor = connection.cursor(dictionary=True)
@@ -23,7 +23,7 @@ def stream_user_age():
 if __name__ == "__main__":
     total_age = 0
     count = 0
-    for row in stream_user_age():
+    for row in stream_user_ages():
         total_age += row.get('age')
         count += 1
     print("Average age of users: {}".format(total_age / count))
