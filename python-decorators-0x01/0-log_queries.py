@@ -3,6 +3,8 @@
 """
 import sqlite3
 import functools
+from datetime import datetime
+import sys, os
 
 
 def log_queries(func):
@@ -18,7 +20,20 @@ def log_queries(func):
         query = kwargs.get('query', None)
         if query is None and len(args) > 0:
             query = args[0]
-        print("SQL query executed: {}".format(query))
+        timestamp = datetime.now().strftime("%b %d %H:%M:%S")
+        try:
+            username = os.getlogin()
+        except OSError:
+            import getpass
+            username = getpass.getuser()
+        filename = os.path.basename(sys.argv[0])
+        pid = os.getpid()
+        log = "{} {} {}[{}]: SQL query executed: {}".format(timestamp,
+                   username,
+                   filename,
+                   pid,
+                   query)
+        print(log)
         func(*args, **kwargs)
     return wrapper_log_queries
 
