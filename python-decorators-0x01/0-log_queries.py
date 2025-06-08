@@ -15,7 +15,7 @@ def log_queries(func):
     Return:
         Decorated version of <func>.
     """
-    functools.wraps(func)
+    @functools.wraps(func)
     def wrapper_log_queries(*args, **kwargs):
         query = kwargs.get('query', None)
         if query is None and len(args) > 0:
