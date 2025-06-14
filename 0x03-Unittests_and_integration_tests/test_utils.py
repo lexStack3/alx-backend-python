@@ -7,8 +7,8 @@ from utils import access_nested_map, get_json
 
 
 class TestAccessNestedMap(unittest.TestCase):
-    """Test class for creating test cases on .access_nested_map.
-    """
+    """Unit tests the utils.access_nested_map function."""
+
     @parameterized.expand([
         ({'a': 1}, ('a',), 1),
         ({'a': {'b': 2}}, ('a',), {'b': 2}),
@@ -22,7 +22,9 @@ class TestAccessNestedMap(unittest.TestCase):
             nested_map (dict): A key value pair for testing.
             path (Sequence): List of key(s) to traverse <nested_map>.
         """
-        self.assertEqual(access_nested_map(nested_map, path=path), expected_value)
+        self.assertEqual(access_nested_map(nested_map,
+                                           path=path),
+                         expected_value)
 
     @parameterized.expand([
         ({}, ('a',)),
@@ -35,6 +37,9 @@ class TestAccessNestedMap(unittest.TestCase):
         with self.assertRaises(KeyError):
             access_nested_map(nested_map, path)
 
+
+class TestGetJson(unittest.TestCase):
+    """Unit tests the utils.get_json function."""
     @parameterized.expand([
         ('http://example.com', {'payload': True}),
         ('http://holberton.io', {'payload': False})
