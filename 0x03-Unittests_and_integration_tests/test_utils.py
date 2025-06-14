@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests the utils.access_nested_map function."""
 import unittest
-from unittest.mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock
 from parameterized import parameterized
 from utils import access_nested_map, get_json
 
@@ -42,7 +42,7 @@ class TestAccessNestedMap(unittest.TestCase):
     @patch('utils.requests.get')
     def test_get_json(self, test_url, test_payload, mock_get):
         """Mocks requests.get and checks returned JSON."""
-        mock_res = MagicMock()
+        mock_res = Mock()
         mock_res.json.return_value = test_payload
         mock_get.return_value = mock_res
 
