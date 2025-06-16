@@ -97,11 +97,14 @@ class TestGithubOrgClient(unittest.TestCase):
         self.assertEqual(result, expected_output)
 
 
-@parameterized_class(('org_payload', 'repos_payload',
-                      'expected_repos', 'apache2_repos'),
-                     [(ORG_PAYLOAD, REPOS_PAYLOAD,
-                       EXPECTED_REPOS, APACHE2_REPOS)
-                      ])
+@parameterized_class([
+    {
+        'org_payload': ORG_PAYLOAD,
+        'repos_payload': REPOS_PAYLOAD,
+        'expected_repos': EXPECTED_REPOS,
+        'apache2_repos': APACHE2_REPOS
+    }
+])
 class TestIntegrationGithubOrgClient(unittest.TestCase):
     """Integration tests for GithubOrgClient.public_repos()"""
     @classmethod
@@ -136,6 +139,12 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         """
         client = GithubOrgClient('google')
         self.assertEqual(client.public_repos(), self.expected_repos)
+
+    def test_public_repos_with_license(self):
+        """Test that public_repos filter correctly by license."""
+        client = GithubOrgClient('google')
+        self.assertEqual(client.public_repos(license='apache-2.0'),
+                         [repo['name'] for repo in self.apache2_repos])
 
 
 if __name__ == "__main__":
