@@ -1,4 +1,4 @@
-from rest_framework import routers
+from rest_framework_nested import routers
 from django.urls import path, include
 from .views import ConversationViewSet, MessageViewSet
 from rest_framework import permissions
@@ -8,7 +8,11 @@ from drf_yasg import openapi
 
 router = routers.DefaultRouter()
 router.register('conversation', ConversationViewSet)
-router.register('message', MessageViewSet)
+
+conversation_router = routers.NestedDefaultRouter(router, r'conversation',
+                                                  lookup='conversation')
+conversation_router.register(r'messages', MessageViewSet,
+                             basename='conversation-messages')
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -25,6 +29,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('', include(conversation_router.urls)),
     path('swagger.json', schema_view.without_ui(cache_timeout=0),
          name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0),
