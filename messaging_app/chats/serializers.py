@@ -24,7 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         """Validates that passwords match."""
-        if attrs['password'] != attr['password2']:
+        if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError({
                 'password': "Passwords do not match."
             })
@@ -69,7 +69,7 @@ class ConversationSerializer(serializers.ModelSerializer):
         source='participants'
     )
     message_count = serializers.SerializerMethodField()
-    messages = MessageSerializer(read_only=True)
+    messages = MessageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Conversation
