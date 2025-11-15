@@ -13,6 +13,8 @@ class User(AbstractUser):
     """A model representation of a <User> instance."""
     user_id = models.UUIDField(primary_key=True, default=uuid.uuid4,
                                editable=False)
+    first_name = models.CharField(max_length=128, blank=False)
+    last_name = models.CharField(max_length=128, blank=False)
     email = models.EmailField(unique=True)
     role = models.CharField(max_length=5, choices=ROLE_CHOICES,
                             default='guest')
