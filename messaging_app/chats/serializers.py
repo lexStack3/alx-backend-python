@@ -68,15 +68,20 @@ class ConversationSerializer(serializers.ModelSerializer):
         queryset=User.objects.all(),
         source='participants'
     )
+    message_count = serializer.SerializerMethodField()
     messages = MessageSerializer(read_only=True)
 
     class Meta:
         model = Conversation
         fields = [
             'conversation_id', 'participants', 'participants_ids',
-            'created_at'
+            'messages', 'message_count', 'created_at'
         ]
         read_only_fields = [
             'conversation_id',
             'created_at'
         ]
+
+    def get_message_count(self, obj):
+        """Returns the number of messages in a <Conversation> instance."""
+        return obj.messages.count()
