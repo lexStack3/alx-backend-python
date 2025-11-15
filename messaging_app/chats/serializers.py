@@ -68,7 +68,7 @@ class ConversationSerializer(serializers.ModelSerializer):
         queryset=User.objects.all(),
         source='participants'
     )
-    message_count = serializer.SerializerMethodField()
+    message_count = serializers.SerializerMethodField()
     messages = MessageSerializer(read_only=True)
 
     class Meta:
