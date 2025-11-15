@@ -11,6 +11,8 @@ class ConversationViewSet(viewsets.GenericViewSet):
     """
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
+    filter_backend = [DjangoFilterBackend]
+    filterset_fields = ['paticipants']
 
     def get_queryset(self):
         """
@@ -34,6 +36,8 @@ class MessageViewSet(viewsets.GenericViewSet):
     """
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
+    filter_backend = [DjangoFilterBackend]
+    filterset_fields = ['sender', 'conversation']
 
     def get_queryset(self):
         """
