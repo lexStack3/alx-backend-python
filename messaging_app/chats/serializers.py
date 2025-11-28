@@ -41,24 +41,31 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
+class Sender(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['user_id', 'username', 'role']
+
+
 class MessageSerializer(serializers.ModelSerializer):
-    sender = UserSerializer(read_only=True)
-    sender_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        write_only=True,
-        source='sender'
-    )
+    sender = Sender(read_only=True)
 
     class Meta:
         model = Message
         fields = [
             'message_id', 'conversation',
-            'sender', 'sender_id',
-            'message_body', 'sent_at'
+            'sender', 'message_body', 'sent_at'
         ]
         read_only_fields = [
             'message_id', 'sent_at', 'sender'
         ]
+
+
+class MessageConversationSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='sender.username')
+    class Meta:
+        model = Message
+        fields = ['message_id', 'username', 'message_body']
 
 
 class ConversationSerializer(serializers.ModelSerializer):
@@ -69,7 +76,7 @@ class ConversationSerializer(serializers.ModelSerializer):
         source='participants'
     )
     message_count = serializers.SerializerMethodField()
-    messages = MessageSerializer(many=True, read_only=True)
+    messages = MessageConversationSerializer(many=True, read_only=True)
 
     class Meta:
         model = Conversation
