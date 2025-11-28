@@ -51,8 +51,11 @@ class Message(models.Model):
     """A model representation of a <Message> instance."""
     message_id = models.UUIDField(primary_key=True, default=uuid.uuid4,
                                   editable=False)
-    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE,
-                                        related_name='messages')
+    conversation = models.ForeignKey(
+        Conversation,
+        on_delete=models.CASCADE,
+        related_name='messages'
+    )
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
     message_body = models.TextField(max_length=2048, blank=False)
     sent_at = models.DateTimeField(auto_now_add=True)
