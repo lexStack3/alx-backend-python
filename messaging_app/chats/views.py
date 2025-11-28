@@ -10,7 +10,7 @@ from .auth import CustomJWTAuthentication
 from .permissions import (
     BlockAnonymous,
     IsMessageOwner,
-    IsConversationParticipant
+    IsParticipantOfConversation
 )
 
 
@@ -21,7 +21,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
     """
     #queryset = Conversation.objects.prefetch_related('participants')
     serializer_class = ConversationSerializer
-    permission_classes = [BlockAnonymous, IsConversationParticipant]
+    permission_classes = [IsParticipantOfConversation]
     filter_backend = [DjangoFilterBackend]
     filterset_fields = ['participants']
 
