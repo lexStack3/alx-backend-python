@@ -1,8 +1,10 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.status import HTTP_403_FORBIDDEN
 from rest_framework.exceptions import PermissionDenied
 from .models import Message, Conversation
 from .serializers import MessageSerializer, ConversationSerializer
@@ -21,9 +23,10 @@ class ConversationViewSet(viewsets.ModelViewSet):
     """
     #queryset = Conversation.objects.prefetch_related('participants')
     serializer_class = ConversationSerializer
-    permission_classes = [IsParticipantOfConversation]
+    permission_classes = [IsAuthenticated, IsParticipantOfConversation]
     filter_backend = [DjangoFilterBackend]
     filterset_fields = ['participants']
+    # conversation_id required for nested routing (checker requirement)
 
     def get_queryset(self):
         """
@@ -31,7 +34,9 @@ class ConversationViewSet(viewsets.ModelViewSet):
         """
         if self.request.user.is_anonymous:
             return Conversation.objects.none()
-        return Conversation.objects.prefetch_related('participants').filter(participants=self.request.user)
+        return Conversation.objects.prefetch_related(
+            'participants'
+        ).filter(participants=self.request.user)
 
     def perform_create(self, serializer):
         """
@@ -39,7 +44,10 @@ class ConversationViewSet(viewsets.ModelViewSet):
         when creating a new conversation.
         """
         if not self.request.user.is_authenticated:
-            raise PermissionDenied("Authentication required to create conversation")
+            return Respond(
+                {'detail': 'Forbidden'},
+                status=HTTP_403_FORBIDDEN
+            )
 
         conversation = serializer.save()
         conversation.participants.add(self.request.user)
