@@ -9,6 +9,8 @@ from rest_framework.exceptions import PermissionDenied
 from .models import Message, Conversation
 from .serializers import MessageSerializer, ConversationSerializer
 from .auth import CustomJWTAuthentication
+from .pagination import MessagePagination
+from .filters import MessageFilter
 from .permissions import (
     BlockAnonymous,
     IsMessageOwner,
@@ -24,9 +26,12 @@ class ConversationViewSet(viewsets.ModelViewSet):
     #queryset = Conversation.objects.prefetch_related('participants')
     serializer_class = ConversationSerializer
     permission_classes = [IsAuthenticated, IsParticipantOfConversation]
+    
+    # For Conversation filter
     filter_backend = [DjangoFilterBackend]
     filterset_fields = ['participants']
     # conversation_id required for nested routing (checker requirement)
+
 
     def get_queryset(self):
         """
@@ -52,14 +57,23 @@ class ConversationViewSet(viewsets.ModelViewSet):
         conversation = serializer.save()
         conversation.participants.add(self.request.user)
 
-    @action(detail=True, serializer_class=MessageSerializer, url_path='messages')
+    @action(
+        detail=True,
+        serializer_class=MessageSerializer,
+        url_path='messages'
+    )
     def messages(self, request, pk=None):
         """
         Lists all messages in a particular conversation.
         """
         conversation = self.get_object()
-        messages = conversation.messages.all().order_by('sent_at')
-        serializer = MessageSerializer(messages, many=True)
+        message_qs = conversation.messages.all().order_by('sent_at')
+        
+        filtered_qs = MessageFilter(request.GET, queryset=message_qs).qs
+
+        paginator = MessagePagination()
+        page = paginator.paginate_queryset(filtered_qs, request)
+        serializer = MessageSerializer(page, many=True)
         return Response(serializer.data)
 
     @messages.mapping.post
@@ -82,7 +96,8 @@ class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all().select_related('conversation', 'sender')
     serializer_class = MessageSerializer
     permission_classes = [BlockAnonymous, IsMessageOwner]
-    filter_backend = [DjangoFilterBackend]
+    pagination_class = MessagePagination
+    filter_backend = [MessageFilter, DjangoFilterBackend]
     filterset_fields = ['sender', 'conversation']
 
     def get_queryset(self):
