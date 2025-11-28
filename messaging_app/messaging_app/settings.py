@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'django_extensions',
     'rest_framework_simplejwt',
+    'django_filters',
 
     # Local Apps
     'chats',
@@ -158,6 +159,9 @@ REST_FRAMEWORK = {
         'chats.auth.CustomJWTAuthentication',
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication'
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
     ],
 }
 
