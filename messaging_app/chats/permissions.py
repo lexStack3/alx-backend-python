@@ -24,10 +24,18 @@ class IsMessageOwner(permissions.BasePermission):
         return request.user == obj.sender
 
 
-class IsConversationParticipant(permissions.BasePermission):
+class IsParticipantOfConversation(permissions.BasePermission):
     """
-    Allow access only if the user is part of a particular conversation.
+    - Deny anonymous users
+    - Allow only participants of a conversation to access or modify
+      messages/conversations
     """
+    message = "Anonymous users are not allowed to perform this action."
+
+    def has_permission(self, request, view):
+        if request.user.is_anonymous:
+            raise PermissionDenied(self.message)
+        return True
 
     def has_object_permission(self, request, view, obj):
         if not isinstance(obj, Conversation):
