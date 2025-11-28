@@ -1,9 +1,9 @@
-from rest_framework.permissions import BasePermission
+from rest_framework import permissions
 from rest_framework.exceptions import PermissionDenied
 from .models import Message, Conversation
 
 
-class BlockAnonymous(BasePermission):
+class BlockAnonymous(permissions.BasePermission):
     """
     Blocks Anonymous accounts.
     """
@@ -15,7 +15,7 @@ class BlockAnonymous(BasePermission):
         return True
 
 
-class IsMessageOwner(BasePermission):
+class IsMessageOwner(permissions.BasePermission):
     """
     Allow access to the owner of a message.
     """
@@ -24,7 +24,7 @@ class IsMessageOwner(BasePermission):
         return request.user == obj.sender
 
 
-class IsConversationParticipant(BasePermission):
+class IsConversationParticipant(permissions.BasePermission):
     """
     Allow access only if the user is part of a particular conversation.
     """
