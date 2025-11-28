@@ -74,7 +74,8 @@ class ConversationViewSet(viewsets.ModelViewSet):
         paginator = MessagePagination()
         page = paginator.paginate_queryset(filtered_qs, request)
         serializer = MessageSerializer(page, many=True)
-        return Response(serializer.data)
+
+        return paginator.get_paginated_response(serializer.data)
 
     @messages.mapping.post
     def post_message(self, request, pk=None):
