@@ -41,7 +41,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
             return Conversation.objects.none()
         return Conversation.objects.prefetch_related(
             'participants'
-        ).filter(participants=self.request.user)
+        ).filter(participants=self.request.user).order_by('-created_at')
 
     def perform_create(self, serializer):
         """
