@@ -45,4 +45,5 @@ def delelte_user_related_data(sender, instance, **kwargs):
     Deletes all user related data left.
     """
     user = instance
+    Message.objects.filter(sender=user).delete()
     MessageHistory.objects.filter(edited_by=user.user_id).delete()
