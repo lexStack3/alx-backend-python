@@ -81,8 +81,8 @@ class Notification(models.Model):
 class MessageHistory(models.Model):
     history_id = models.UUIDField(primary_key=True, default=uuid.uuid4,
                                   editable=False)
-    message = models.ForeignKey(Message, on_delete=models.CASCADE,
-                                related_name="history")
+    message_id = models.CharField(max_length=36)
+    edited_by = models.CharField(max_length=128)
     old_content = models.TextField()
     edited_at = models.DateTimeField(auto_now_add=True)
 
@@ -91,6 +91,6 @@ class MessageHistory(models.Model):
         A string representation of a <MessageHistory> instance.
         """
         return "History for {} at {}".format(
-            self.message.message_id,
+            self.message_id,
             self.edited_at
         )
