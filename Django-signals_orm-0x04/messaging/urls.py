@@ -24,4 +24,8 @@ urlpatterns = [
          name='delete-user'),
     path('list-users/', views.list_users,
          name='list-users'),
+    path('thread/<uuid:user_id>/', views.thread_view,
+         name='thread_view'),
+    path('unread_messages/', views.unread_messages,
+         name='unread_messages'),
 ]
