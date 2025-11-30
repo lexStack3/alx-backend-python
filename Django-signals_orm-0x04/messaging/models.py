@@ -3,6 +3,13 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 
+class UnreadMessagesManager(models.Manager):
+    def unread_for_user(self, user):
+        return self.filter(receiver=user, read=False).only(
+            "message_id", "sender", "receiver", "content", "timestamp"
+        )
+
+
 class User(AbstractUser):
     """
     Model representation of a User instance.
@@ -52,6 +59,8 @@ class Message(models.Model):
         on_delete=models.CASCADE,
         related_name='replies'
     )
+
+    unread = UnreadMessagesManager()
 
     def __str__(self):
         """
