@@ -5,6 +5,9 @@ from .models import Message, Notification, MessageHistory
 
 @receiver(post_save, sender=Message)
 def notifyReceiver(sender, instance, created, **kwargs):
+    """
+    Notifies a receiver of a message.
+    """
     if created:
         notfi = Notification.objects.create(
             sender=instance.sender,
@@ -13,6 +16,9 @@ def notifyReceiver(sender, instance, created, **kwargs):
 
 @receiver(pre_save, sender=Message)
 def log_old_message(sender, instance, **kwargs):
+    """
+    Logs old content of a message before updating.
+    """
     if not instance.pk:
         return
 
@@ -23,7 +29,8 @@ def log_old_message(sender, instance, **kwargs):
 
     if old_message.content != instance.content:
         MessageHistory.objects.create(
-            message=instance,
+            message_id=instance.message_id,
+            edited_by=instance.sender.user_id,
             old_content=old_message.content
         )
         instance.edited = True
