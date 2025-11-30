@@ -1,6 +1,10 @@
-from django.db.models.signals import post_save, pre_save
+from django.contrib.auth import get_user_model
+from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
 from .models import Message, Notification, MessageHistory
+
+
+User = get_user_model()
 
 
 @receiver(post_save, sender=Message)
@@ -34,3 +38,11 @@ def log_old_message(sender, instance, **kwargs):
             old_content=old_message.content
         )
         instance.edited = True
+
+@receiver(post_delete, sender=User)
+def delelte_user_related_data(sender, instance, **kwargs):
+    """
+    Deletes all user related data left.
+    """
+    user = instance
+    MessageHistory.objects.filter(edited_by=user.user_id).delete()
