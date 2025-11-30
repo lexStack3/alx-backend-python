@@ -77,7 +77,7 @@ class Message(models.Model):
         """
         return (
             Message.objects
-            .filter(sender__in=[sender, receiver], receiver__in[sender, receiver])
+            .filter(sender__in=[sender, receiver], receiver__in=[sender, receiver])
             .select_related("sender", "receiver", "parent_message")
             .prefetch_related("replies")
             .order_by("timestamp")
