@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
-from .models import Message, Notification
+from .models import Message, Notification, MessageHistory
 
 User = get_user_model()
 
@@ -21,3 +21,9 @@ class MessageAdmin(admin.ModelAdmin):
                     'receiver_id', 'content',
                     'timestamp')
     list_filter = ('timestamp',)
+
+@admin.register(MessageHistory)
+class MessageHistoryAdmin(admin.ModelAdmin):
+    list_display = ('history_id', 'message_id',
+                    'old_content', 'edited_at')
+    list_filter = ('edited_at',)
