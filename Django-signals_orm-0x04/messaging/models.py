@@ -53,37 +53,6 @@ class Message(models.Model):
         related_name='replies'
     )
 
-    def get_thread(self):
-        """
-        Returns a message and all its replies in a nested dict structure.
-        This method uses recursion to build threaded conversation trees.
-        """
-        return {
-            "message_id": str(self.message_id),
-            "sender": self.sender.username,
-            "receiver": self.receiver.username,
-            "content": self.content,
-            "created_at": self.created_at,
-            "replies": [
-                reply.get_thread() for reply in self.replies.all()
-            ]
-        }
-
-    @staticmethod
-    def fetch_conversation(sender, receiver):
-        """
-        Efficiently fetch all messages between two users using select_related
-        and prefecth_related to minimize database queries.
-        """
-        return (
-            Message.objects
-            .filter(sender__in=[sender, receiver], receiver__in=[sender, receiver])
-            .select_related("sender", "receiver", "parent_message")
-            .prefetch_related("replies")
-            .order_by("timestamp")
-        )
-
-
     def __str__(self):
         """
         String representation of a <Message> instance.
