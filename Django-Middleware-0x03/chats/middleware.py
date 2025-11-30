@@ -95,3 +95,27 @@ class OffensiveLanguageMiddleware:
         if x_forwarded_for:
             return x_forwarded_for.split(',')[0]
         return request.META.get("REMOTE_ADDR")
+
+
+class RolepermissionMiddleware:
+    """
+    Grants access to admin user to the admin page.
+    """
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self.allowed_roles = ["admin", "moderator"]
+
+    def __call__(self, request):
+        user = request.user
+
+        if request.method == "POST" and request.path == "/api/conversation/":
+            if not user.is_authenticated:
+                return HttpResponseForbidden("You must be logged in to create a conversation.")
+            
+            user_role = getattr(user, "role", None)
+            if not (user_role in self.allowed_roles):
+                return HttpResponseForbidden(
+                    "Only admins and moderators can create conversations."
+                )
+
+        return self.get_response(request)
