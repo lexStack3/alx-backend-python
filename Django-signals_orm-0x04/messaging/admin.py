@@ -25,5 +25,6 @@ class MessageAdmin(admin.ModelAdmin):
 @admin.register(MessageHistory)
 class MessageHistoryAdmin(admin.ModelAdmin):
     list_display = ('history_id', 'message_id',
-                    'old_content', 'edited_at')
+                    'edited_by', 'old_content',
+                    'edited_at')
     list_filter = ('edited_at',)
