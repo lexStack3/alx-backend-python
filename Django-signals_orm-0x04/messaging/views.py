@@ -104,3 +104,21 @@ def thread_view(request, user_id):
         "conversation_between": f"{current_user.username} <-> {receiver.username}",
         "threaded_message": conversation_tree
     }, safe=False)
+
+@login_required
+def unread_messages(request):
+    user = request.user
+    messages = Message.unread.unread_for_user(user)
+    
+    data = [
+        {
+            "message_id": str(msg.message_id),
+            "sender": msg.sender.username,
+            "receiver": msg.receiver.username,
+            "content": msg.content,
+            "timestamp": msg.timestamp.isoformat(),
+        }
+        for msg in messages
+    ]
+
+    return JsonResponse({"unread_messages": data})
