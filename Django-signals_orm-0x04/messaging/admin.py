@@ -19,5 +19,5 @@ class NotificationApp(admin.ModelAdmin):
 class MessageAdmin(admin.ModelAdmin):
     list_display = ('message_id', 'sender_id',
                     'receiver_id', 'content',
-                    'created_at')
-    list_filter = ('created_at',)
+                    'timestamp')
+    list_filter = ('timestamp',)
