@@ -108,7 +108,14 @@ def thread_view(request, user_id):
 @login_required
 def unread_messages(request):
     user = request.user
-    messages = Message.unread.unread_for_user(user)
+    messages = Message.unread.unread_for_user(user).only(
+        "message_id",
+        "sender",
+        "receiver",
+        "content",
+        "timestamp"
+    )
+
     
     data = [
         {
