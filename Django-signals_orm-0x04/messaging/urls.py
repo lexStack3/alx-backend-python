@@ -28,4 +28,6 @@ urlpatterns = [
          name='thread_view'),
     path('unread_messages/', views.unread_messages,
          name='unread_messages'),
+    path('conversation_messages/<uuid:receiver_id>/',
+         views.conversation_messages, name='conversation-messages'),
 ]
