@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
+from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.http import require_http_methods
+from django.views.decorators.http import require_http_methods
 from django.shortcuts import get_object_or_404
 from django.db import models
 from .models import Message
@@ -60,7 +61,7 @@ def list_users(request):
 
 
 @login_required
-@require_http_method(['GET', 'POST'])
+@require_http_methods(['GET', 'POST'])
 def thread_view(request, user_id):
     """
     GET: Return the threaded conversation between current user and another user.
@@ -90,7 +91,7 @@ def thread_view(request, user_id):
 
     # GET: Fetch threaded conversation
     current_user = request.user
-    qs Message.objects.filter(
+    qs = Message.objects.filter(
         models.Q(sender=current_user, receiver=receiver)
         | models.Q(sender=receiver, receiver=current_user)
     ).select_related("sender", "receiver", "parent_message").prefetch_selected("replies").order_by("timestamp")
@@ -129,3 +130,30 @@ def unread_messages(request):
     ]
 
     return JsonResponse({"unread_messages": data})
+
+@login_required
+@cache_page(60)
+def conversation_messages(request, receiver_id):
+    """
+    Displays a list of messages in a conversation.
+    """
+    user = request.user
+
+    messages = Message.objects.filter(
+        sender=user, receiver_id=receiver_id
+    ).union(
+        Message.objects.filter(sender_id=receiver_id, receiver=user)
+    ).select_related("sender", "receiver").order_by("timestamp")
+
+    data = [
+        {
+            "message_id": str(msg.message_id),
+            "sender": msg.sender.username,
+            "receiver": msg.receiver.username,
+            "content": msg.content,
+            "timestamp": msg.timestamp.isoformat()
+        }
+        for msg in messages
+    ]
+
+    return JsonResponse({"messages": data})
