@@ -27,7 +27,7 @@ def log_old_message(sender, instance, **kwargs):
         return
 
     try:
-        old_message = Message.objects.get(pk=instance.pk)
+        old_message = Message.objects.get(message_id=instance.pk)
     except Message.DoesNotExist:
         return
 
