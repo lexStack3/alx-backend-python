@@ -14,6 +14,7 @@ RUN python3 manage.py makemigrations
 
 RUN python3 manage.py migrate
 
+# Port mapping is done at runtime using: docker run -p 8080:8000 messaging_app
 EXPOSE 8000
 
-CMD ["python3", "manage.py", "runserver"]
+CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
