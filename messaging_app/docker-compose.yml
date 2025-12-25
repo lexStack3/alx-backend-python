@@ -1,6 +1,6 @@
 services:
   web:
-    container_name: messaing_app
+    container_name: messaging_app
     build: .
     ports:
       - "8080:8000"
