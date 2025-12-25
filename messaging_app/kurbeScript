@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+# Sets up a local cluster 'cluster-info' on kubernetes using minikube 
+
+minikube start --driver=docker --memory=1900 --cpus=2 -p cluster-info
+
+# Verifying if local cluster is created using kubectl
+kubectl get nodes
