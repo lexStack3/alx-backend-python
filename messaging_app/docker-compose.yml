@@ -1,0 +1,36 @@
+services:
+  web:
+    container_name: messaing_app
+    build: .
+    ports:
+      - "8080:8000"
+    command: >
+      sh -c "
+      until nc -z db 3306; do
+        echo 'Waiting for MySQL...';
+        sleep 2;
+      done;
+      python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8000
+      "
+    env_file:
+      - .env
+    depends_on:
+      - db
+    volumes:
+      - app_data:/app
+
+  db:
+    container_name: messaging_app_db
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DB}
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  app_data:
+  mysql_data:
