@@ -1,8 +1,23 @@
 #!/usr/bin/bash
 # Sets up a local cluster 'cluster-info' on kubernetes using minikube 
 
-minikube start --driver=docker --memory=1900 --cpus=2 -p cluster-info
+# Cleaning up previous attempts if any
+minikube delete -p cluster-info --all --purge
 
-# Verifying if local cluster is created using kubectl
+echo "🚀 Starting stable single-node cluster..."
+
+minikube start \
+    --driver=docker \
+    --memory=2500 \
+    --cpus=2 \
+    --nodes=1 \
+    -p cluster-info
+
+# Verifying API server
 kubectl cluster-info
 kubectl get pods
+
+# Enabling metics + dashboard
+minikube addons enable metrics-server dashboard
+
+echo "✅ Cluster ready! Use 'kubectl get pods --all-namespaces'"
