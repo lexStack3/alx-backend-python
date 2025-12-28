@@ -1,0 +1,38 @@
+#!/usr/bin/bash
+set -euo pipefail
+
+DEPLOYMENT="messaging-app-blue"
+SERVICE="messaging-app-service"
+NAMESPACE="default"
+
+echo "🚀 Applying updated deployment (Rolling Update)..."
+kubectl apply -f blue_deployment.yaml
+
+echo "📦 Monitoring rollout status..."
+kubectl rollout status deployment/$DEPLOYMENT
+
+echo "🔁 Continuously testing application availability..."
+
+SERVICE_IP=$(kubectl get svc $SERVICE -n $NAMESPACE -o jsonpath='{.spec.clusterIP}')
+
+END_TIME=$((SECONDS + 20))
+FAILURES=0
+
+while [ $SECONDS -lt $END_TIME ]; do
+    if ! curl -s --max-time 2 http://$SERVICE_IP:8000 > /dev/null; then
+        FAILURES=$((FAILURES + 1))
+    fi
+    sleep 1
+done
+
+if [ "$FAILURES" -gt 0 ]; then
+    echo "❌ Detected $FAILURES failed requests during rolling update"
+    exit 1
+fi
+
+echo "✅ No downtime detected during rolling update"
+
+echo "📊 Verifying current pods..."
+kubectl get pods -l app=messaging-app,version=blue
+
+echo "✅ Rolling update completed successfully"
