@@ -1,4 +1,45 @@
 #!/usr/bin/bash
 # Scales applications in kubernetes
 
-kubectl scale deployment messaging-app-deployment --replicas=3
+set -euo pipefail
+
+DEPLOYMENT_NAME="messaging-app-deployment"
+REPLICAS=3
+APP_LABEL="app=messaging-app"
+SERVICE_URL=${SERVICE_URL:-http://127.0.0.1:40941}
+
+echo "🚀 Scaling deployment '$DEPLOYMENT_NAME' to $REPLICAS replicas..."
+kubectl scale deployment "$DEPLOYMENT_NAME" --replicas="$REPLICAS"
+
+
+echo "📦 Waiting for all pods to be in 'Running' state..."
+SECONDS=0
+TIMEOUT=60
+
+until [[ $(kubectl get pods -l "$APP_LABEL" --field-selector=status.phase=Running --no-headers | wc -l) -eq $REPLICAS ]]; do
+    if [[ $SECONDS -ge $TIMEOUT ]]; then
+        echo "❌ Timeout: not all pods reached 'Running' state"
+        kubectl get pods -l "$APP_LABEL"
+        exit 1
+    fi
+    sleep 2
+done
+
+echo "✅ All $REPLICAS pods are running."
+
+echo "📝 Listing all pods:"
+kubectl get pods -l "$APP_LABEL"
+
+echo "⚡ Performing load test using wrk..."
+wrk -t1 -c10 -d20s "$SERVICE_URL"
+
+echo "📊 Load test completed."
+
+echo "📈 Monitoring pod resource usage..."
+if kubectl get apiservices | grep -q metrics.k8s.io; then
+    kubectl top pods -l "$APP_LABEL"
+else
+    echo "⚠️ metrics-server not detected. Skipping 'kubectl top pods'."
+fi
+
+echo "✅ Script completed successfully."
