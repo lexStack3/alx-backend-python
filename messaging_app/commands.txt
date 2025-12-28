@@ -1,0 +1,3 @@
+minikube addons enable ingress-nginx -p cluster-info
+minikube apply -f ingress.yaml
+minikube tunnel -p cluster-info
