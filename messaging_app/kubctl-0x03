@@ -6,7 +6,7 @@ SERVICE="messaging-app-service"
 NAMESPACE="default"
 
 echo "🚀 Applying updated deployment (Rolling Update)..."
-kubectl apply -f blue_deployment.yaml
+kubectl apply -f messaging_app/blue_deployment.yaml
 
 echo "📦 Monitoring rollout status..."
 kubectl rollout status deployment/$DEPLOYMENT
