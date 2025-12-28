@@ -13,8 +13,8 @@ spec:
         app: messaging-app
     spec:
       containers:
-        - name: messaing-app-web
-          image: messaging_app:0.1.1
+        - name: messaging-app-web
+          image: messaging_app:0.1.0
           imagePullPolicy: IfNotPresent
           command: ["python3"]
           args: ["manage.py", "runserver", "0.0.0.0:8000"]
@@ -27,7 +27,10 @@ spec:
                   name: messaging-app-secrets
                   key: SECRET_KEY
             - name: DEBUG
-              value: "True"
+              valueFrom:
+                secretKeyRef:
+                  name: messaging-app-secrets
+                  key: DEBUG
 
 ---
 apiVersion: v1
