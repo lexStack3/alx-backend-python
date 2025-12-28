@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+# Scales applications in kubernetes
+
+kubectl scale --replicas=3 deployment/messaging-app-deployment
