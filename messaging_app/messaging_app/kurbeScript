@@ -2,7 +2,7 @@
 # Sets up a local cluster 'cluster-info' on kubernetes using minikube 
 
 # Cleaning up previous attempts if any
-minikube delete -p cluster-info --all --purge
+minikube delete -p cluster-info
 
 echo "🚀 Starting stable single-node cluster..."
 
