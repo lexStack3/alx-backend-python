@@ -1,0 +1,23 @@
+#!/usr/bin/bash
+
+set -euo pipefail
+
+echo "🚀 Deploying BLUE version..."
+kubectl apply -f blue_deployment.yaml
+
+echo "📦 Waiting for BLUE pods..."
+kubectl rollout status deployment/messaging-app-blue
+
+echo "🚀 Deploying GREEN version..."
+kubectl apply -f green_deployment.yaml
+
+echo "📦 Waiting for GREEN pods..."
+kubectl rollout status deployment/messaging-app-green
+
+echo "🧪 Checking logs of GREEN deployment for errors..."
+kubectl logs deployment/messaging-app-green --tail=20
+
+echo "🔁 Switching service traffic to GREEN..."
+kubectl apply -f kubeservice.yaml
+
+echo "✅ Blue-Green deployment completed successfully."
