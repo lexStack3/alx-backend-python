@@ -2,21 +2,26 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout Source') {
+        stage('Checkout Code') {
             steps {
-                checkout scm
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/lexStack3/alx-backend-python.git',
+                        credentialsId: 'github-credentials'
+                    ]]
+                ])
             }
         }
 
-        stage('Install Python & Dependencies') {
+        stage('Install Dependencies') {
             steps {
                 sh '''
-                    apt-get update
-                    apt-get install -y python3 python3-venv python3-pip
                     python3 -m venv venv
                     . venv/bin/activate
                     pip install --upgrade pip
-                    pip install -r requirements.txt
+                    pip install -r messaging_app/requirements.txt
                 '''
             }
         }
@@ -25,16 +30,16 @@ pipeline {
             steps {
                 sh '''
                     . venv/bin/activate
-                    pytest --juintxml=test-results.xml
+                    pytest messaging_app --junitxml=report.xml
                 '''
             }
         }
     }
 
-
     post {
         always {
-            junit 'test-results.xml'
+            junit 'report.xml'
         }
     }
 }
+
