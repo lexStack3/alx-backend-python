@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_NAME = 'etekahub/messaing-app-jenkins'
+        IMAGE_TAG = 'latest'
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -10,32 +15,31 @@ pipeline {
             }
         }
 
-    stages {
-        stage('Install Dependencies') {
+        stage('Build Docker Image') {
             steps {
-                sh '''
-                    python3 -m venv venv
-                    . venv/bin/activate
-                    pip3 install --upgrade pip3
-                    pip3 install -r messaging_app/requirements.txt
-                '''
+                script {
+                    docker.build("${IMAGE_NAME}:${IMAGE_TAG}", "messaging_app")
+                }
             }
         }
 
-        stage('Run Tests') {
+        stage('Push Docker Image') {
             steps {
-                sh '''
-                    . venv/bin/activate
-                    pytest messaging_app --junitxml=report.xml
-                '''
+                script {
+                    docker.withRegistry('', 'dockerhub-cred') {
+                        docker.image("${IMAGE_NAME}:${IMAGE_TAG}").push()
+                    }
+                }
             }
         }
     }
 
     post {
-        always {
-            junit 'report.xml'
+        success {
+            echo "Docker image built and pushed successfully."
+        }
+        failure {
+            echo "Docker build or push failed."
         }
     }
 }
-
