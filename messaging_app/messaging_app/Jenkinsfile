@@ -18,7 +18,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${IMAGE_NAME}:${IMAGE_TAG}", "messaging_app")
+                    docker.build("${IMAGE_NAME}:${IMAGE_TAG}", ".")
                 }
             }
         }
