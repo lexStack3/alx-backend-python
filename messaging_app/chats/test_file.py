@@ -1,2 +1,2 @@
-def chat_test():
+def test_chat():
     assert True
