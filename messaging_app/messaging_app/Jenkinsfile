@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'etekahub/messaing-app-jenkins'
+        IMAGE_NAME = 'etekahub/messaging-app-jenkins'
         IMAGE_TAG = 'v0.0.1'
     }
 
