@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = 'etekahub/messaing-app-jenkins'
-        IMAGE_TAG = 'latest'
+        IMAGE_TAG = 'v0.0.1'
     }
 
     stages {
