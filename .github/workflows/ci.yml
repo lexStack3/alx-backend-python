@@ -1,0 +1,84 @@
+name: Django CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: test_user
+          MYSQL_PASSWORD: test_pass
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # -------------------------
+      # CODE QUALITY: FLAKE8
+      # -------------------------
+      - name: Run flake8 linting
+        run: |
+          flake8 .
+
+      # -------------------------
+      # DATABASE MIGRATIONS
+      # -------------------------
+      - name: Run migrations
+        env:
+          DB_NAME: test_db
+          DB_USER: test_user
+          DB_PASSWORD: test_pass
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+        run: |
+          python manage.py migrate
+
+      # -------------------------
+      # TESTS + COVERAGE
+      # -------------------------
+      - name: Run tests with coverage
+        env:
+          DB_NAME: test_db
+          DB_USER: test_user
+          DB_PASSWORD: test_pass
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+        run: |
+          coverage run manage.py test
+          coverage xml
+          coverage report
+
+      # -------------------------
+      # UPLOAD COVERAGE REPORT
+      # -------------------------
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
+
